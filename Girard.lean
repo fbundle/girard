@@ -24,7 +24,7 @@ structure WFPoset T extends Poset T where
 instance: Coe (WFPoset T) (Poset T) where
   coe s := s.toPoset
 
-structure P (u: Nat) where
+structure PType (u: Nat) where
   T: Type u
   carrier: WFPoset T
 
@@ -34,7 +34,7 @@ def preserveOrder (s1: Poset T) (s2: Poset V) (f: T → V): Prop :=
   (s1.rel a b) → (s2.rel (f a) (f b))
 
 -- prec - relation in P
-def prec (s1: P u) (s2: P u): Prop :=
+def prec (s1: PType u) (s2: PType u): Prop :=
   ∃ (f: s1.T → s2.T),
   -- f preserves order
   preserveOrder (s1.carrier) (s2.carrier) f
@@ -44,12 +44,21 @@ def prec (s1: P u) (s2: P u): Prop :=
   ∀ s: s2.T, ∃ t: s1.T, (f t = s) →
   s2.carrier.rel s r
 
-def surjToP (f: α → P u): Prop :=
-  ∀ s: P u,
+-- construct well-founded poset P
+def P: WFPoset (PType u) := {
+  rel := prec,
+  trans := sorry, -- exercise for readers
+  wf := sorry, -- exercise for readers
+}
+
+
+
+def surjToP (f: α → PType u): Prop :=
+  ∀ s: PType u,
   ∃ a: α,
   f a = s
 
-theorem girard {T: Type u} : ¬ ∃ f: T → P u, surjToP f := by
+theorem girard {T: Type u} : ¬ ∃ f: T → PType u, surjToP f := by
   intro exist_surj_f
   rcases exist_surj_f with ⟨f, surj_f⟩
   dsimp [surjToP] at surj_f
