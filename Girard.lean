@@ -1,21 +1,19 @@
-def isTrans (r: T → T → Prop): Prop :=
-  ∀ a: T, ∀ b: T, ∀ c: T,
-  (r a b) → (r b c) → (r a c)
 
-def infChain {T} := Nat → T
-
-def isWF (r: T → T → Prop): Prop :=
-  ¬ (
-    ∃ f: Nat → T,
-    ∀ n: Nat,
-    let x2 := f (n+1)
-    let x1 := f n
-    r x2 x1
-  )
+def isTrans (rel: T → T → Prop): Prop :=
+  ∀ {a b c: T}, (rel a b) → (rel b c) → (rel a c)
 
 structure Poset T where
   rel: T → T → Prop
   trans: isTrans rel
+
+def isWF (rel: T → T → Prop): Prop :=
+  ¬ (
+    ∃ f: Nat → T,
+    ∀ n: Nat,
+    let x2 := f n.succ
+    let x1 := f n
+    rel x2 x1
+  )
 
 structure WFPoset T extends Poset T where
   wf: isWF rel
@@ -44,25 +42,76 @@ def prec (s1: PType u) (s2: PType u): Prop :=
   ∀ s: s2.T, ∃ t: s1.T, (f t = s) →
   s2.carrier.rel s r
 
+-- exercise for readers
+def PisTrans: @isTrans (PType u) prec :=
+  sorry
+
 -- construct well-founded poset P
-def P: WFPoset (PType u) := {
+def P: Poset (PType u) := {
   rel := prec,
-  trans := sorry, -- exercise for readers
-  wf := sorry, -- exercise for readers
+  trans := PisTrans,
 }
 
+noncomputable def aoc {α : Type u} {P : α → Prop} (h : ∃ x, P x) : { x // P x } :=
+  ⟨Classical.choose h, Classical.choose_spec h⟩
 
 
-def surjToP (f: α → PType u): Prop :=
+def PisWF: @isWF (PType u) P.rel := by
+  dsimp [isWF]
+  intro existsSeq
+  rcases existsSeq with ⟨S, hS⟩
+
+  let s (n: Nat): (S n).T :=
+    let Sn1_lt_Sn := hS n
+    let ⟨fn , ⟨_, RDominates⟩⟩  := aoc Sn1_lt_Sn
+    let ⟨r, hr⟩ := aoc RDominates
+    r
+
+  let f (n: Nat): (S (n+1)).T → (S n).T :=
+    let Sn1_lt_Sn := hS n
+    let ⟨fn , ⟨_, RDominates⟩⟩  := aoc Sn1_lt_Sn
+    fn
+
+  let rec lift {k: Nat} {n: Nat} (s': (S (n + k)).T): (S n).T :=
+    match k with
+      | 0 => s' -- S_n → S_n
+      | Nat.succ k1 =>
+        let h_eq : (n + Nat.succ k1) = (Nat.succ n + k1) := by
+          rw [Nat.add_succ, Nat.succ_add]
+        let s_casted := cast (by rw [h_eq]) s'
+        (f n) (lift s_casted)
+
+  let liftToS0 (n: Nat) (s': (S n).T): (S 0).T :=
+    let h_eq: (0 + n) = n := by simp
+    let s_casted := cast (by rw [h_eq]) s'
+    lift s_casted
+
+  let f (n: Nat): (S 0).T :=
+    let h_eq: (0 + n) = n := by simp
+    let s_casted := cast (by rw [h_eq]) (s n)
+    lift s_casted
+
+  have S0WF := (S 0).carrier.wf
+  dsimp [isWF] at S0WF
+
+
+  have hf: ∀ (n: Nat), (S 0).carrier.rel (f n.succ) (f n) := by
+    intro n
+
+
+    sorry
+
+
+  exact S0WF ⟨f, hf⟩
+
+
+
+
+
+def surjToP (f: T → PType u): Prop :=
   ∀ s: PType u,
-  ∃ a: α,
-  f a = s
+  ∃ x: T,
+  f x = s
 
-theorem girard {T: Type u} : ¬ ∃ f: T → PType u, surjToP f := by
-  intro exist_surj_f
-  rcases exist_surj_f with ⟨f, surj_f⟩
-  dsimp [surjToP] at surj_f
-
-
-
+theorem girard {T: Type u}: ¬ ∃ (f: T → PType u), surjToP f :=
   sorry
