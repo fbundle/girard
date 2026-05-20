@@ -1,0 +1,7 @@
+name = "girard"
+version = "0.1.0"
+defaultTargets = ["Girard"]
+
+[[lean_lib]]
+name = "Girard"
+root = "Girard"
