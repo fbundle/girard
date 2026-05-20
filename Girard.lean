@@ -20,16 +20,14 @@ structure Poset T where
 structure WFPoset T extends Poset T where
   wf: isWF rel
 
+structure P (u: Nat) where
+  carrier {T: Type u}: WFPoset T
 
-def P (T: Type u) := WFPoset T
 
-def surjectiveToP (f: α → P T): Prop :=
-  ∀ (s: P T),
-  ∃ (a: α),
-  s = f a
+def surjToP (f: α → P u): Prop :=
+  ∀ s: P u,
+  ∃ a: α,
+  f a = s
 
-theorem girard: ¬ (∃ f: α → P T, surjectiveToP f) := by
-  intro exists_f
-  rcases exists_f with ⟨f, f_surj⟩
-
+theorem girard {T: Type u} : ¬ ∃ f: T → P u, surjToP f :=
   sorry

@@ -1,0 +1,101 @@
+\documentclass{article}
+
+
+\usepackage{../../../latex_styles/color_template_thmnum}
+\usepackage{../../../latex_styles/symbol_def}
+
+\usepackage{parskip}
+
+\title{
+	Girard Paradox
+}
+\author{Nguyen Ngoc Khanh}
+
+\DeclareMathOperator{\wf}{wf}
+\DeclareMathOperator{\Type}{Type}
+
+
+\begin{document}	
+\maketitle
+
+This is a short note summarizing the proof of Martin-Löf \cite{martin1972intuitionistic} on Girard Paradox. Formally, a system admitting the type of all types is inconsistent, that motivates the use of $\Type n: \Type (n+1)$ in Martin-Löf Type Theory
+
+We will use the language of set in the summary for familiarity.
+
+Firstly, we introduce the notion of poset used in this document
+
+\begin{definition}[poset]
+	A poset $X$ is a set equipped with a transitive relation $<$, that is
+	$$
+		x < y \text{ and } y < z \text{ implies } x < z
+	$$
+	for every $x, y, z \in X$
+\end{definition}
+
+\begin{definition}[well-founded]
+	A poset $X$ is said to be well-founded if there is no infinitely decending chain 
+	$$
+		... < x_n < x_{n-1} < ... < x_1 < x_0
+	$$
+	We write $\wf X$
+\end{definition}
+
+Note that, if $X$ is a set and $x < x$ for some $x \in X$, then $X$ cannot be well-founded poset. Since $x < x$ introduces an infinite decending chain
+$$
+... < x < x
+$$
+
+\begin{lemma}
+	\label{lemma3}
+	if $X$ is a set and $x < x$ for some $x \in X$, then $X$ cannot be well-founded poset
+\end{lemma}
+
+Let $\mc{P}$ be the collection of well-founded posets.
+
+$$
+	\mc{P} = \set{S: \Set \; | \; \wf S}
+$$
+
+Assuming $\mc{P}$ is a set $\mc{P}: \Set$, we can construct a transitive relation $\prec$ on $\mc{P}$ as follows: for every $S, R \in \mc{P}$, $S \prec R$ if and only if there exists an order preserving map $f: S \to R$ such that there exists an element $r \in R$ that dominates all elements in the image of $f$, that is for every $x \in \im f \subseteq R$, $x < r$.
+
+Now, assuming the partially ordered set $\mc{P}$ (with $\prec$) is not well-founded, that is, there exists an infinite chain in $\mc{P}$
+$$
+	... \prec S_n \prec S_{n-1} \prec ... \prec S_1 \prec S_0
+$$
+
+Let denote the map $f_n: S_{n+1} \to S_n$ and $s_n \in S_n$ corresponding to the relation $S_{n+1} \prec S_n$. Then, for every $n$, for every $x \in \im f_n$, $x < s_n$, that implies
+$$
+	s_{n-1} < s_n \text{ in } S_n
+$$
+
+We can construct an infinitely decending chain in $S_0$ by
+$$
+	... < s_n < s_{n-1} < ... < s_1 < s_0
+$$
+
+This contradicts the assumption that all elements of $\mc{P}$ being well-founded. Therefore, if $\mc{P}$ is a set, it must be well-founded, hence $\mc{P} \in \mc{P}$. Next, we will write $P := \mc{P}$ in the context where $\mc{P}$ is an element of $\mc{P}$. 
+
+Now, we will show that $S \prec P$ for every $S \in \mc{P}$
+
+\begin{definition}[initial segment]
+	Let $S$ be a poset, the initial segment of $S$ at $r \in S$ is defined by
+	$$
+		S_r = \set{y \in S: y < r}
+	$$
+	
+	If $S$ is well-founded, then $S_r$ is also a well-founded poset.	
+\end{definition}
+
+For every $S \in \mc{P}$, define the map
+\begin{align*}
+	g_S: S &\to \mc{P} \\
+	r &\mapsto S_r
+\end{align*}
+
+This map makes $S \prec P$. In particular, $P \prec P$ in $\mc{P}$, lemma \ref{lemma3}  leads to contradiction.
+
+\bibliography{references}
+\end{document}
+
+	
+
