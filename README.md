@@ -1,5 +1,7 @@
 # Girard's Paradox
 
+Supplement to [girard.pdf](https://fbundle.github.io/assets/public_doc/1_original_notes/girard/main.pdf)
+
 A Lean 4 formalization of Martin-Löf's proof that a type theory admitting `Type : Type` is inconsistent. The argument is due to Girard (1972), refined by Martin-Löf (1972).
 
 The full mathematical argument is in [`Girard.tex`](Girard.tex). The Lean proof is in [`Girard.lean`](Girard.lean). The sections below follow both files in parallel.
